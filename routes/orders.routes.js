@@ -103,7 +103,7 @@ router.patch("/:orderId/complete", isAuth, async (req, res, next) => {
       },
       { status: "completed" },
       { new: true }
-    );
+    ).populate("products.productId");
     console.log(updatedOrder);
 
     if (updatedOrder) {
