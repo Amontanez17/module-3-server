@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const DB_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/cohort-tools-api";
+const DB_URI =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/module-3-ecommerce";
 // IIFE Immediately Invoked Function Execution
 (async function () {
   try {

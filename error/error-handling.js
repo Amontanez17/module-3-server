@@ -1,6 +1,7 @@
 const errorHandler = (err, req, res, next) => {
+  console.log(`EROOR: `, req.method, req.originalUrl, err.message, err);
   if (!res.headersSent) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 const notFoundHandler = (req, res, next) => {
