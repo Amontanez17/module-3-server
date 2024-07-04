@@ -1,6 +1,7 @@
 const { isAuth } = require("../middleware/jwt.middleware");
 const Product = require("../models/Product.model");
 const User = require("../models/User.model");
+const Comment = require("../models/Comment.model");
 const router = require("express").Router();
 
 // GET ALL PRODUCTS ROUTE
@@ -33,12 +34,33 @@ router.get("/:productId", async (req, res, next) => {
   try {
     const { productId } = req.params;
     const oneProduct = await Product.findOne({ _id: productId });
-    const comments = await Comment.find({ productId }).populate(
-      "user",
-      "product"
-    );
+    const comments = await Comment.find({ productId }).populate("creator");
     console.log("Retrieved product ->", oneProduct);
-    res.json({ oneProduct, comments });
+    res.json({ product: oneProduct, comments });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ROUTE TO ADD A COMMENT ON A PRODUCT
+
+router.post("/:productId/comment", isAuth, async (req, res, next) => {
+  try {
+    const { id } = req.payload;
+    const { text, rating } = req.body;
+    const { productId } = req.params;
+
+    // Create a new comment object
+    const newComment = new Comment({
+      productId: productId,
+      creator: id,
+      text,
+      rating: rating,
+    });
+
+    // Save the new comment to the database
+    const createdComment = await newComment.save();
+    res.status(201).json(createdComment);
   } catch (error) {
     next(error);
   }

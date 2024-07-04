@@ -5,7 +5,7 @@ require("./../config/dbConnect");
 const User = require("./../models/User.model");
 const Product = require("./../models/Product.model");
 const Order = require("./../models/Order.model");
-const Comment = require("./../models/Comment.model");
+
 const password = "password";
 const bcrypt = require("bcryptjs");
 

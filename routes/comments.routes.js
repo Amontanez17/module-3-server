@@ -1,32 +1,61 @@
 const { isAuth } = require("../middleware/jwt.middleware");
 const Product = require("../models/Product.model");
 const User = require("../models/User.model");
+const Comment = require("../models/Comment.model");
 const router = require("express").Router();
-
-//ROUTE TO ADD A COMMENT ON A PRODUCT
-
-router.post("/:productId/comment", isAuth, async (req, res, next) => {
-  try {
-    const { userId } = req.payload;
-    const { content, rating } = req.body;
-    const { productId } = req.params;
-
-    // Create a new comment object
-    const newComment = new Comment({
-      productId: productId,
-      userId: userId,
-      comment: content,
-      rating: rating,
-    });
-
-    // Save the new comment to the database
-    const createdComment = await newComment.save();
-    res.status(201).json(createdComment);
-  } catch (error) {
-    next(error);
-  }
-});
 
 // ROUTE TO UPDATE COMMENTS
 
-router.put("/userId/comments/:commentId", isAuth, async (req, res, next) => {});
+router.put("/:commentId/update", isAuth, async (req, res, next) => {
+  try {
+    const { commentId } = req.params;
+    const { id } = req.payload;
+    const { text, rating } = req.body;
+    const commentToUpdate = { text, rating };
+    let updatedComment;
+
+    // Find and update
+
+    if (req.isAuth) {
+      updatedComment = await Comment.findByIdAndUpdate(
+        commentId,
+        commentToUpdate,
+        {
+          new: true,
+        }
+      );
+    } else {
+      updatedComment = await Comment.findOneAndUpdate(
+        { _id: commentId, creator: id },
+        commentToUpdate,
+        { new: true }
+      );
+    }
+
+    if (!updatedComment) {
+      return res.status(401).json({ message: "Denied" });
+    }
+
+    res.status(202).json(updatedComment);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// ROUTE TO DELETE COMMENTS
+
+router.delete("/:commentId/delete", isAuth, async (req, res, next) => {
+  try {
+    const { commentId } = req.params;
+    const { id } = req.payload;
+    await Comment.findOneAndDelete({
+      _id: commentId,
+      creator: id,
+    });
+    res.sendStatus(204);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+module.exports = router;
