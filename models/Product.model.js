@@ -2,13 +2,15 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const productSchema = new Schema({
-  title: { type: String, required: true },
-  price: { type: Number, required: true },
-  description: { type: String, required: true },
-  category: {
+  name: { type: String, required: true },
+  breweryName: { type: String },
+  price: { type: String, required: true },
+  description: { type: String },
+  detailsType: {
     type: String,
-    enum: ["men's clothing", "women's clothing", "electronics", "jewelry"],
   },
+  detailsRegion: { type: String },
+  abv: { type: String },
   image: { type: String, default: "https://imgur.com/QkIa5tT" },
 });
 

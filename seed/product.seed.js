@@ -1,6 +1,7 @@
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 require("./../config/dbConnect");
+const beers = require("./beers.json");
 
 const User = require("./../models/User.model");
 const Product = require("./../models/Product.model");
@@ -21,8 +22,16 @@ seed();
 
 async function seed() {
   try {
-    await User.deleteMany();
+    const deletedUser = await User.deleteMany();
+    console.log(`deleted ${deletedUser.deletedCount} user`);
     const createdUser = await User.create(user1);
+    console.log(`created ${createdUser.length} user`);
+    await Product.deleteMany();
+    await Product.create(
+      beers.map((beer) => {
+        return { ...beer, price: beer.priceDouble || 0 };
+      })
+    );
     const allProducts = await Product.find();
 
     const completedOrder = {
