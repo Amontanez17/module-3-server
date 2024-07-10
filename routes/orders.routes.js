@@ -46,7 +46,7 @@ router.put("/add/:productId", isAuth, async (req, res, next) => {
     if (existingOrder) {
       existingOrder.products.push({
         productId: req.params.productId,
-        quantity: req.body.quantity,
+        quantity: req.body.quantity || 1,
       });
       await existingOrder.populate("products.productId");
       await existingOrder.save();
@@ -57,7 +57,7 @@ router.put("/add/:productId", isAuth, async (req, res, next) => {
         userId: req.payload.id,
         status: "pending",
         products: [
-          { productId: req.params.productId, quantity: req.body.quantity },
+          { productId: req.params.productId, quantity: req.body.quantity || 1 },
         ],
       });
       await newOrder.populate("products.productId");

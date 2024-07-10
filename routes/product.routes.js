@@ -34,7 +34,9 @@ router.get("/:productId", async (req, res, next) => {
   try {
     const { productId } = req.params;
     const oneProduct = await Product.findOne({ _id: productId });
-    const comments = await Comment.find({ productId }).populate("creator");
+    const comments = await Comment.find({ productId })
+      .sort({ createdAt: -1 })
+      .populate("creator");
     console.log("Retrieved product ->", oneProduct);
     res.json({ product: oneProduct, comments });
   } catch (error) {
