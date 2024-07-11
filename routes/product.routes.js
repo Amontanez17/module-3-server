@@ -14,7 +14,6 @@ router.get("/", async (req, res, next) => {
   }
   if (rating) {
     query["rating.rate"] = { $gte: Number(rating) };
-    // query.rating = { rate: { $gte: Number(rating) } };
   }
   if (category) {
     query.category = new RegExp(category, "i");
@@ -81,18 +80,5 @@ router.get("/product/:productCategory", isAuth, async (req, res, next) => {
     next(error);
   }
 });
-
-// GET COMMENTS ON A SINGLE PRODUCT
-
-// router.get("/:productId", async (req, res, next) => {
-//   try {
-//     const { productId } = req.params;
-//     const oneProduct = await Product.findOne({ _id: productId });
-//     console.log("Retrieved cohorts ->", oneProduct);
-//     res.json(oneProduct);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 module.exports = router;
