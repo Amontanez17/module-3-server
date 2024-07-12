@@ -38,7 +38,7 @@ router.put("/:commentId/update", isAuth, async (req, res, next) => {
 
     res.status(202).json(updatedComment);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 });
 
@@ -54,7 +54,7 @@ router.delete("/:commentId/delete", isAuth, async (req, res, next) => {
     });
     res.sendStatus(204);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 });
 
