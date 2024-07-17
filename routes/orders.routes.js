@@ -44,10 +44,22 @@ router.put("/add/:productId", isAuth, async (req, res, next) => {
     }).populate("products.productId");
     console.log(existingOrder);
     if (existingOrder) {
-      existingOrder.products.push({
-        productId: req.params.productId,
-        quantity: req.body.quantity || 1,
-      });
+      const existingProduct = existingOrder.products.find(
+        (product) => product.productId.id === req.params.productId
+      );
+
+      if (!existingProduct) {
+        existingOrder.products.push({
+          productId: req.params.productId,
+          quantity: req.body.quantity || 1,
+        });
+      } else {
+        existingOrder.products.forEach((product) => {
+          if (product.productId.id === req.params.productId) {
+            product.quantity++;
+          }
+        });
+      }
       await existingOrder.populate("products.productId");
       await existingOrder.save();
       console.dir(existingOrder);
@@ -72,21 +84,29 @@ router.put("/add/:productId", isAuth, async (req, res, next) => {
 // PUT REMOVE ITEM FROM THE CART ROUTE
 router.put("/remove/:productId", isAuth, async (req, res, next) => {
   try {
-    const existingOrder = await Order.findOneAndUpdate(
+    let existingOrder = await Order.findOneAndUpdate(
       {
         userId: req.payload.id,
         status: "pending",
       },
-
-      { $pull: { products: { productId: req.params.productId } } },
+      {
+        $pull: { products: { productId: req.params.productId, quantity: 1 } },
+      },
       { new: true }
     ).populate("products.productId");
 
-    if (existingOrder) {
-      res.status(200).json(existingOrder);
-    } else {
-      res.status(400).json({ message: "Pending order not found" });
+    existingOrder = await Order.findOne({
+      userId: req.payload.id,
+      status: "pending",
+    });
+    for (const product of existingOrder.products) {
+      if (String(product.productId) === req.params.productId) {
+        product.quantity--;
+      }
     }
+    await existingOrder.save();
+    await existingOrder.populate("products.productId");
+    res.status(200).json(existingOrder);
   } catch (error) {
     next(error);
   }
